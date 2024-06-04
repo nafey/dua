@@ -29,22 +29,32 @@ let parseLiteral = (token) => {
 	}
 }
 
-let parseAssignment = (tokens) => {
-	let lhs = parseVar(tokens[0]);
+let parseOperation = (tokens) => {
+	let lhs = parseLiteral(tokens[0]);
 	let op = parseOp(tokens[1]);
 	let rhs = parseLiteral(tokens[2]);
 
-	return {
-		type: "ASSIGN",
-		lhs: lhs,
-		op: op,
-		rhs: rhs
+	if (op.val === "+") {
+		return {
+			type: "SUM",
+			lhs: lhs,
+			op: op,
+			rhs: rhs
+		};
+	}
+	else {
+		return {
+			type: "ASSIGN",
+			lhs: lhs,
+			op: op,
+			rhs: rhs
+		}
 	}
 }
 
-let parseExpr  = (tokens) : any => {
+export let parseExpr  = (tokens) : any => {
 	if (tokens.length > 1) {
-		return parseAssignment(tokens)
+		return parseOperation(tokens)
 	}
 	else {
 		return parseLiteral(tokens[0])
@@ -85,3 +95,5 @@ let parseBlock = (tokens) => {
 export function parse (tokens) {
 	return parseBlock(tokens)
 }
+
+

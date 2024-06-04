@@ -1,5 +1,5 @@
 export function tokenize (code : string) {
-	let tokens : any= [];
+	let tokens : any = [];
 
 	let lines: string[] = code.split("\n");
 
@@ -7,7 +7,9 @@ export function tokenize (code : string) {
 		let items = line.split(" ");
 
 		items.forEach((item: string) => {
-			if (item === "=") {
+			item = item.trim();
+			
+			if (item === "=" || item === "+") {
 				tokens.push({type: "OP", val: item});
 			}
 			else if (["1", "2", "3"].includes(item)) {

@@ -42,7 +42,7 @@ let parseAssignment = (tokens) => {
 	}
 }
 
-let parseExpr = (tokens) => {
+let parseExpr  = (tokens) : any => {
 	if (tokens.length > 1) {
 		return parseAssignment(tokens)
 	}
@@ -51,6 +51,37 @@ let parseExpr = (tokens) => {
 	}
 }
 
+let parseBlock = (tokens) => {
+	// Find EOl
+	let exprs : any = [];
+
+	let pulled: any= [];
+
+	tokens.forEach((t) => {
+		if (t.type === "EOL") {
+			exprs.push(parseExpr(pulled));
+			pulled = [];
+		}
+		else {
+			pulled.push(t);
+		}
+	});
+
+	if (pulled.length > 0) exprs.push(parseExpr(pulled));
+
+
+	if (exprs.length <= 1) {
+		return exprs[0];
+	}
+	else {
+		return {
+			type: "BLOCK",
+			exprs: exprs
+		}
+	}
+
+}
+
 export function parse (tokens) {
-	return parseExpr(tokens)
+	return parseBlock(tokens)
 }

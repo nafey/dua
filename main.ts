@@ -1,12 +1,9 @@
 import { tokenize } from "./token.ts";
 import { parse } from "./parse.ts";
 import { exec } from "./exec.ts";
+import {readFile} from "./utils.ts";
 
+// const code = await Deno.readTextFile("a.dua");
+const code = await readFile("a.dua");
 
-
-let code = "a = 1"
-exec(parse(tokenize(code)))
-
-// let ret = parse(tokens)
-// console.log(ret)
-
+exec(parse(tokenize(code)));

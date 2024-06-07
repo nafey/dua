@@ -6,7 +6,14 @@ let isNum = (stm) => {
 }
 
 let execNum = (stm) => {
-	return parseInt(stm.val);
+	let num = 0;
+	if (isNum(stm)) {
+		num = parseInt(stm.val);
+	}
+	else {
+		num = execExpr(stm) as number;
+	}
+	return num;
 }
 
 let execAssign = (stm) => {
@@ -14,23 +21,7 @@ let execAssign = (stm) => {
 }
 
 let execSum = (stm) => {
-	let lhs, rhs;
-
-	if (isNum(stm.lhs)) {
-		lhs = execNum(stm.lhs)
-	}
-	else  {
-		lhs = execExpr(stm.lhs)
-	}	
-
-	if (isNum(stm.rhs)) {
-		rhs = execNum(stm.rhs)
-	}
-	else  {
-		rhs = execExpr(stm.rhs)
-	}	
-
-	return rhs + lhs;
+	return execNum(stm.lhs) + execNum(stm.rhs);
 }
 
 let execMultiplication = (stm) => {
@@ -38,8 +29,11 @@ let execMultiplication = (stm) => {
 }
 
 function execExpr(stm) {
-	if (stm.type == "ASSIGN") {
+	if (stm.type === "ASSIGN") {
 		execAssign(stm);
+	}
+	else if (stm.type === "NUM") {
+		return execNum(stm);
 	}
 	else if (stm.type === "SUM") {
 		return execSum(stm);

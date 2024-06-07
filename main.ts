@@ -8,7 +8,7 @@ const code = await readFile("a.dua");
 
 
 let interpret = (code) => {
-	exec(parse(tokenize(code)))
+	return exec(parse(tokenize(code)))
 }
 
 let parseT = (code) => {
@@ -16,4 +16,5 @@ let parseT = (code) => {
 }
 
 // console.log(parseT(code));
-interpret(code);
+let ret = interpret(code);
+console.log(ret);

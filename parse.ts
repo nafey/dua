@@ -1,10 +1,9 @@
-
 let isDigits = (s: string) => {
 	return /^\d+$/.test(s);
 }
 
-let isSum = (token) => {
-	return (token.type === "OP" && token.val === "+");
+let isAdditive = (token) => {
+	return (token.type === "OP" && (token.val === "+" || token.val === "-"));
 }
 
 let parseNumber = (token) => {
@@ -50,6 +49,14 @@ let parseOperation = (tokens) => {
 			rhs: rhs
 		};
 	}
+	else if (op.val === "-") {
+		return {
+			type: "DIFF",
+			lhs: lhs,
+			op: op,
+			rhs: rhs
+		}
+	}
 	else if (op.val === "*") {
 		return {
 			type: "MUL",
@@ -68,14 +75,14 @@ let parseOperation = (tokens) => {
 	}
 }
 
-let parseAdditive = (tokens: []) => {
-	let before = [];	
-	let after: [] = [];
+let parseAdditive = (tokens: any[]) => {
+	let before : any[] = [];	
+	let after: any[] = [];
 	let i = 0;
 
 	for (i = 0; i < tokens.length; i++) {
-		let item = tokens[i];
-		if (isSum(item)) {
+		let item : any = tokens[i];
+		if (isAdditive(item)) {
 			break;
 		}
 
@@ -90,7 +97,7 @@ let parseAdditive = (tokens: []) => {
 	if (after.length > 0) {
 
 		return {
-			type: "SUM",
+			type: (tokens[i].val === "+") ? "SUM" : "DIFF",
 			lhs: parseExpr(before),
 			rhs: parseAdditive(after)
 		}
@@ -141,7 +148,8 @@ let parseBlock = (tokens) => {
 }
 
 export function parse (tokens) {
-	return parseBlock(tokens)
+	let ret =  parseBlock(tokens)
+	return ret;
 }
 
 

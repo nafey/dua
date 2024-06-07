@@ -1,3 +1,7 @@
+let isDigits = (s: string) => {
+	return /^\d+$/.test(s);
+}
+
 export function tokenize (code : string) {
 	let tokens : any = [];
 
@@ -9,10 +13,10 @@ export function tokenize (code : string) {
 		items.forEach((item: string) => {
 			item = item.trim();
 			
-			if (item === "=" || item === "+" || item === "*") {
+			if (item === "=" || item === "+" || item === "*" || item === "-") {
 				tokens.push({type: "OP", val: item});
 			}
-			else if (["1", "2", "3"].includes(item)) {
+			else if (isDigits(item)) {
 				tokens.push({type: "NUM", val: item});
 			}
 			else {

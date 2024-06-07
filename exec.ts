@@ -28,6 +28,10 @@ let execMultiplication = (stm) => {
 	return execNum(stm.lhs) * execNum(stm.rhs);
 }
 
+let execDiff = (stm) => {
+	return execNum(stm.lhs) - execNum(stm.rhs);
+}
+
 function execExpr(stm) {
 	if (stm.type === "ASSIGN") {
 		execAssign(stm);
@@ -40,6 +44,9 @@ function execExpr(stm) {
 	}
 	else if (stm.type === "MUL") {
 		return execMultiplication(stm);
+	}
+	else if (stm.type === "DIFF") {
+		return execDiff(stm);
 	}
 	else if (stm.type === "BLOCK") {
 		stm.exprs.forEach((expr) => {

@@ -11,4 +11,9 @@ let interpret = (code) => {
 	exec(parse(tokenize(code)))
 }
 
+let parseT = (code) => {
+	return parse(tokenize(code))
+}
+
+// console.log(parseT(code));
 interpret(code);

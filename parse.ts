@@ -2,7 +2,7 @@
 let parseNumber = (token) => {
 	return {
 		type: "NUM",
-		val: token.val
+		val: parseInt(token.val)
 	};
 }
 
@@ -32,7 +32,7 @@ let parseLiteral = (token) => {
 let parseOperation = (tokens) => {
 	let lhs = parseLiteral(tokens[0]);
 	let op = parseOp(tokens[1]);
-	let rhs = parseLiteral(tokens[2]);
+	let rhs = parseExpr(tokens.splice(2));
 
 	if (op.val === "+") {
 		return {
@@ -41,6 +41,14 @@ let parseOperation = (tokens) => {
 			op: op,
 			rhs: rhs
 		};
+	}
+	else if (op.val === "*") {
+		return {
+			type: "MUL",
+			lhs: lhs,
+			op: op,
+			rhs: rhs
+		}
 	}
 	else {
 		return {

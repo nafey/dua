@@ -25,7 +25,7 @@ let execSum = (stm) => {
 }
 
 let execMultiplication = (stm) => {
-	last = parseInt(stm.lhs.val) * parseInt(stm.rhs.val);
+	return execNum(stm.lhs) * execNum(stm.rhs);
 }
 
 function execExpr(stm) {

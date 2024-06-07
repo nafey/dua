@@ -16,5 +16,4 @@ let parseT = (code) => {
 }
 
 // console.log(parseT(code));
-let ret = interpret(code);
-console.log(ret);
+console.log(interpret(code));

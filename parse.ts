@@ -1,4 +1,12 @@
 
+let isDigits = (s: string) => {
+	return /^\d+$/.test(s);
+}
+
+let isSum = (token) => {
+	return (token.type === "OP" && token.val === "+");
+}
+
 let parseNumber = (token) => {
 	return {
 		type: "NUM",
@@ -21,7 +29,7 @@ let parseVar = (token) => {
 }
 
 let parseLiteral = (token) => {
-	if (["1", "2", "3"].includes(token.val )) {
+	if (isDigits(token.val)) {
 		return parseNumber(token);
 	}
 	else {
@@ -60,6 +68,38 @@ let parseOperation = (tokens) => {
 	}
 }
 
+let parseAdditive = (tokens: []) => {
+	let before = [];	
+	let after: [] = [];
+	let i = 0;
+
+	for (i = 0; i < tokens.length; i++) {
+		let item = tokens[i];
+		if (isSum(item)) {
+			break;
+		}
+
+		before.push(item);
+	}
+
+	for (let j = i + 1; j < tokens.length; j++) {
+		let item = tokens[j];
+		after.push(item);	
+	}
+
+	if (after.length > 0) {
+
+		return {
+			type: "SUM",
+			lhs: parseExpr(before),
+			rhs: parseAdditive(after)
+		}
+	}
+	else {
+		return parseExpr(tokens);
+	}
+}
+
 export let parseExpr  = (tokens) : any => {
 	if (tokens.length > 1) {
 		return parseOperation(tokens)
@@ -73,11 +113,11 @@ let parseBlock = (tokens) => {
 	// Find EOl
 	let exprs : any = [];
 
-	let pulled: any= [];
+	let pulled: any = [];
 
 	tokens.forEach((t) => {
 		if (t.type === "EOL") {
-			exprs.push(parseExpr(pulled));
+			exprs.push(parseAdditive(pulled));
 			pulled = [];
 		}
 		else {
@@ -85,7 +125,7 @@ let parseBlock = (tokens) => {
 		}
 	});
 
-	if (pulled.length > 0) exprs.push(parseExpr(pulled));
+	if (pulled.length > 0) exprs.push(parseAdditive(pulled));
 
 
 	if (exprs.length <= 1) {

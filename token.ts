@@ -9,7 +9,7 @@ export function tokenize (code : string) {
 		items.forEach((item: string) => {
 			item = item.trim();
 			
-			if (item === "=" || item === "+") {
+			if (item === "=" || item === "+" || item === "*") {
 				tokens.push({type: "OP", val: item});
 			}
 			else if (["1", "2", "3"].includes(item)) {

@@ -13,8 +13,11 @@ export function tokenize (code : string) {
 		items.forEach((item: string) => {
 			item = item.trim();
 			
-			if (item === "=" || item === "+" || item === "*" || item === "-") {
+			if (item === "=" || item === "+" || item === "*" || item === "-" || item === "/") {
 				tokens.push({type: "OP", val: item});
+			}
+			else if (item === "(" || item === ")") {
+				tokens.push({type: "PAREN", val: item});
 			}
 			else if (isDigits(item)) {
 				tokens.push({type: "NUM", val: item});

@@ -28,6 +28,10 @@ let execMultiplication = (stm) => {
 	return execNum(stm.lhs) * execNum(stm.rhs);
 }
 
+let execDivision = (stm) => {
+	return execNum(stm.lhs) / execNum(stm.rhs);
+}
+
 let execDiff = (stm) => {
 	return execNum(stm.lhs) - execNum(stm.rhs);
 }
@@ -44,6 +48,9 @@ function execExpr(stm) {
 	}
 	else if (stm.type === "MUL") {
 		return execMultiplication(stm);
+	}
+	else if (stm.type === "DIV") {
+		return execDivision(stm);
 	}
 	else if (stm.type === "DIFF") {
 		return execDiff(stm);

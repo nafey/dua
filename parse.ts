@@ -6,6 +6,11 @@ let isAdditive = (token) => {
 	return (token.type === "OP" && (token.val === "+" || token.val === "-"));
 }
 
+let isMultiplicative = (token) => {
+	return (token.type === "OP" && (token.val === "*" || token.val === "/"))
+
+}
+
 let parseNumber = (token) => {
 	return {
 		type: "NUM",
@@ -52,6 +57,14 @@ let parseOperation = (tokens) => {
 	else if (op.val === "-") {
 		return {
 			type: "DIFF",
+			lhs: lhs,
+			op: op,
+			rhs: rhs
+		}
+	}
+	else if (op.val === "/") {
+		return {
+			type: "DIV",
 			lhs: lhs,
 			op: op,
 			rhs: rhs

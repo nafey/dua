@@ -41,63 +41,40 @@ let parseLiteral = (token) => {
 	}
 }
 
-let parseOperation = (tokens) => {
-	let lhs = parseLiteral(tokens[0]);
-	let op = parseOp(tokens[1]);
-	let rhs = parseExpr(tokens.splice(2));
 
-	if (op.val === "+") {
-		return {
-			type: "SUM",
-			lhs: lhs,
-			op: op,
-			rhs: rhs
-		};
-	}
-	else if (op.val === "-") {
-		return {
-			type: "DIFF",
-			lhs: lhs,
-			op: op,
-			rhs: rhs
-		}
-	}
-	else if (op.val === "/") {
-		return {
-			type: "DIV",
-			lhs: lhs,
-			op: op,
-			rhs: rhs
-		}
-	}
-	else if (op.val === "*") {
-		return {
-			type: "MUL",
-			lhs: lhs,
-			op: op,
-			rhs: rhs
-		}
+let op = {
+	"+": "SUM",
+	"-": "DIFF",
+	"*": "MUL",
+	"/": "DIV",
+}
+
+let parsePrimary = (tokens: any[]) => {
+	if (tokens.length > 1) throw Error("Parse Primary got multiple tokens");
+
+	let token = tokens[0];
+
+	if (isDigits(token.val)) {
+		return parseNumber(token);
 	}
 	else {
-		return {
-			type: "ASSIGN",
-			lhs: lhs,
-			op: op,
-			rhs: rhs
-		}
+		return parseVar(token);
 	}
 }
 
-let parseAdditive = (tokens: any[]) => {
+let parseBinary = (tokens: any[], matchOp: string[], nextFn: Function) => {
 	let before : any[] = [];	
 	let after: any[] = [];
 	let i = 0;
 
 	for (i = 0; i < tokens.length; i++) {
 		let item : any = tokens[i];
-		if (isAdditive(item)) {
-			break;
-		}
+		if (item.type === "OP" && matchOp.includes(item.val)) {
+			break;	
+		}	
+		// if (isAdditive(item)) {
+		// 	break;
+		// }
 
 		before.push(item);
 	}
@@ -110,24 +87,25 @@ let parseAdditive = (tokens: any[]) => {
 	if (after.length > 0) {
 
 		return {
-			type: (tokens[i].val === "+") ? "SUM" : "DIFF",
-			lhs: parseExpr(before),
-			rhs: parseAdditive(after)
+			type: op[tokens[i].val],
+			lhs: nextFn(before),
+			// rhs: parseAdditive(after),
+			rhs: parseBinary(after, matchOp, nextFn)
 		}
 	}
 	else {
-		return parseExpr(tokens);
+		return nextFn(tokens);
 	}
 }
 
-export let parseExpr  = (tokens) : any => {
-	if (tokens.length > 1) {
-		return parseOperation(tokens)
-	}
-	else {
-		return parseLiteral(tokens[0])
-	}
+let parseMultiplicative = (tokens: any[]) => {
+	return parseBinary(tokens, ["*", "/"], parsePrimary)
 }
+
+export let parseAdditive = (tokens: any[]) => {
+	return parseBinary(tokens, ["+", "-"], parseMultiplicative)
+}
+
 
 let parseBlock = (tokens) => {
 	// Find EOl

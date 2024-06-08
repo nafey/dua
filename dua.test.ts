@@ -1,6 +1,6 @@
 import { expect, test, beforeEach,  } from "bun:test";
 import { tokenize } from "./token.ts";
-import { parse, parseExpr , parseAdditive } from "./parse.ts";
+import { parse, parseAdditive } from "./parse.ts";
 import { exec } from "./exec.ts";
 import { readFile } from "./utils.ts";
 
@@ -13,6 +13,10 @@ import { readFile } from "./utils.ts";
 let interpret = (code) => {
 	return exec(parse(tokenize(code)))
 }
+
+test("Sum 1", () => {
+	expect(interpret("1 + 1")).toBe(2);
+});
 
 test("Mul 1", () => {
 	expect(interpret("2 * 3")).toBe(6);
@@ -38,12 +42,3 @@ test("Div 2", () => {
 	expect(interpret("8 + 2 / 2")).toBe(9);
 });
 
-test("Sum 1", () => {
-	let ret = parse(tokenize("1 + 1"))
-	// console.log(ret);
-});
-
-
-test("Sum 2", () => {
-
-})

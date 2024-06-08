@@ -1,27 +1,19 @@
+let op = {
+	"+": "SUM",
+	"-": "DIFF",
+	"*": "MUL",
+	"/": "DIV",
+}
+
 let isDigits = (s: string) => {
 	return /^\d+$/.test(s);
 }
 
-let isAdditive = (token) => {
-	return (token.type === "OP" && (token.val === "+" || token.val === "-"));
-}
-
-let isMultiplicative = (token) => {
-	return (token.type === "OP" && (token.val === "*" || token.val === "/"))
-
-}
 
 let parseNumber = (token) => {
 	return {
 		type: "NUM",
 		val: parseInt(token.val)
-	};
-}
-
-let parseOp = (token) => {
-	return {
-		type: "OP",
-		val: token.val
 	};
 }
 
@@ -32,22 +24,6 @@ let parseVar = (token) => {
 	};
 }
 
-let parseLiteral = (token) => {
-	if (isDigits(token.val)) {
-		return parseNumber(token);
-	}
-	else {
-		return parseVar(token);
-	}
-}
-
-
-let op = {
-	"+": "SUM",
-	"-": "DIFF",
-	"*": "MUL",
-	"/": "DIV",
-}
 
 let parsePrimary = (tokens: any[]) => {
 	if (tokens.length > 1) throw Error("Parse Primary got multiple tokens");

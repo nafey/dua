@@ -1,9 +1,10 @@
-let isDigits = (s: string) => {
-	return /^\d+$/.test(s);
+export interface Token {
+	type: string,
+	val: string
 }
 
-export function tokenize (code : string) {
-	let tokens : any[] = [];
+export function tokenize (code : string) : Token[] {
+	let tokens : Token[] = [];
 
 	let lines: string[] = code.split("\n");
 

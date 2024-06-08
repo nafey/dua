@@ -1,34 +1,36 @@
+import { Token } from "./token";
+
+export type Node = BlockNode | BinaryNode | ValNode;
+
+export interface BinaryNode {
+	type: string,
+	lhs: Token | Node,
+	rhs: Token | Node
+}
+
+export interface ValNode {
+	type: string,
+	val: string
+}
+
+export interface BlockNode {
+	type: string,
+	exprs: Node[]
+}
+
 let op = {
 	"+": "SUM",
 	"-": "DIFF",
 	"*": "MUL",
 	"/": "DIV",
+	"=": "ASSIGN"
 }
 
-let isDigits = (s: string) => {
-	return /^\d+$/.test(s);
-}
-
-
-let parseNumber = (token) => {
-	return {
-		type: "NUM",
-		val: parseInt(token.val)
-	};
-}
-
-let parseVar = (token) => {
-	return {
-		type: "VAR",
-		val: token.val
-	};
-}
-
-let parsePrimary = (tokens: any[]) => {
-	let token = tokens[0];
+let parsePrimary = (tokens: Token[]): Node => {
+	let token: Token = tokens[0];
 
 	if (tokens.length >= 2) {
-		let lastToken = tokens[tokens.length - 1];
+		let lastToken: Token = tokens[tokens.length - 1];
 
 		if (token.type === "PAREN" && token.val === "(") {
 			if (lastToken.type === "PAREN" && lastToken.val === ")") {
@@ -42,22 +44,17 @@ let parsePrimary = (tokens: any[]) => {
 
 	if (tokens.length > 1) throw Error("Parse Primary got multiple tokens");
 
-	if (isDigits(token.val)) {
-		return parseNumber(token);
-	}
-	else {
-		return parseVar(token);
-	}
+	return token;
 }
 
-let parseBinary = (tokens: any[], matchOp: string[], nextFn: Function) => {
-	let before : any[] = [];	
-	let after: any[] = [];
-	let openParens = 0;
-	let i = 0;
+let parseBinary = (tokens: Token[], matchOp: string[], nextFn: Function): Node => {
+	let before: Token[] = [];	
+	let after: Token[] = [];
+	let openParens: number = 0;
+	let i: number = 0;
 
 	for (i = 0; i < tokens.length; i++) {
-		let item : any = tokens[i];
+		let item: Token = tokens[i];
 		if (item.type === "PAREN" && item.val === "(") openParens++;
 		if (item.type === "PAREN" && item.val === ")") {
 			openParens--;
@@ -74,7 +71,7 @@ let parseBinary = (tokens: any[], matchOp: string[], nextFn: Function) => {
 	if (openParens !== 0) throw Error("Mismatched Parens");
 
 	for (let j = i + 1; j < tokens.length; j++) {
-		let item = tokens[j];
+		let item: Token = tokens[j];
 		after.push(item);	
 	}
 
@@ -83,7 +80,6 @@ let parseBinary = (tokens: any[], matchOp: string[], nextFn: Function) => {
 		return {
 			type: op[tokens[i].val],
 			lhs: nextFn(before),
-			// rhs: parseAdditive(after),
 			rhs: parseBinary(after, matchOp, nextFn)
 		}
 	}
@@ -92,24 +88,28 @@ let parseBinary = (tokens: any[], matchOp: string[], nextFn: Function) => {
 	}
 }
 
-let parseMultiplicative = (tokens: any[]) => {
+let parseMultiplicative = (tokens: Token[]): Node => {
 	return parseBinary(tokens, ["*", "/"], parsePrimary)
 }
 
-export let parseAdditive = (tokens: any[]) => {
+export let parseAdditive = (tokens: Token[]): Node => {
 	return parseBinary(tokens, ["+", "-"], parseMultiplicative)
 }
 
+let parseAssign = (tokens: Token[]): Node => {
+	return parseBinary(tokens, ["="], parseAdditive);
+}
 
-let parseBlock = (tokens : any[]) => {
+
+let parseBlock = (tokens: Token[]): Node => {
 	// Find EOl
-	let exprs : any = [];
+	let exprs: Node[] = [];
 
-	let pulled: any = [];
+	let pulled: Token[] = [];
 
 	tokens.forEach((t) => {
 		if (t.type === "EOL") {
-			exprs.push(parseAdditive(pulled));
+			exprs.push(parseAssign(pulled));
 			pulled = [];
 		}
 		else {
@@ -117,7 +117,7 @@ let parseBlock = (tokens : any[]) => {
 		}
 	});
 
-	if (pulled.length > 0) exprs.push(parseAdditive(pulled));
+	if (pulled.length > 0) exprs.push(parseAssign(pulled));
 
 
 	if (exprs.length <= 1) {
@@ -132,7 +132,7 @@ let parseBlock = (tokens : any[]) => {
 
 }
 
-export function parse (tokens) {
+export function parse (tokens: Token[]): Node {
 	let ret =  parseBlock(tokens)
 	return ret;
 }

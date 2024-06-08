@@ -1,5 +1,4 @@
 let vars = {};
-let last = 0;
 
 let isNum = (stm) => {
 	return stm.type === "NUM";
@@ -17,7 +16,7 @@ let execNum = (stm) => {
 }
 
 let execAssign = (stm) => {
-	vars[stm.lhs.val] = stm.rhs.val
+	vars[stm.lhs.val] = execNum(stm.rhs)
 }
 
 let execSum = (stm) => {
@@ -67,4 +66,7 @@ export function exec(stm){
 	return val;
 }
 
-
+export function dump(stm) : Object {
+	exec(stm);
+	return vars;
+}

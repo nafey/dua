@@ -1,16 +1,18 @@
 import { expect, test} from "bun:test";
 import { tokenize } from "./token.ts";
-import { parse, parseAdditive } from "./parse.ts";
-import { exec } from "./exec.ts";
+import { parse } from "./parse.ts";
+import { exec, dump } from "./exec.ts";
 import { readFile } from "./utils.ts";
 
 // const consoleDebug: any = console.debug;
-
 // console.log = () => {};
 
-
 let interpret = (code) => {
-	return exec(parse(tokenize(code)))
+	return exec(parse(tokenize(code)));
+}
+
+let dumpVars = (code): any => {
+	return dump(parse(tokenize(code)));
 }
 
 test("Sum 1", () => {
@@ -59,4 +61,8 @@ test("Paren 4", () => {
 
 test("No Space", () => {
 	expect(interpret("2+2")).toBe(4);
+});
+
+test("Assign", () => {
+	expect(dumpVars("a = 1").a).toBe(1);
 })

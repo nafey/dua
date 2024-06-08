@@ -3,31 +3,52 @@ let isDigits = (s: string) => {
 }
 
 export function tokenize (code : string) {
-	let tokens : any = [];
+	let tokens : any[] = [];
 
 	let lines: string[] = code.split("\n");
 
 	lines.forEach((line: string) => {
-		let items = line.split(" ");
+		// let items = line.split(" ");
+		let chars = line.split("");
 
-		items.forEach((item: string) => {
-			item = item.trim();
-			
-			if (item === "=" || item === "+" || item === "*" || item === "-" || item === "/") {
-				tokens.push({type: "OP", val: item});
+		let peek = (idx: number) => {
+			if (idx < chars.length) return chars[idx];
+			else return "";
+		}
+
+
+		for (let i = 0; i < chars.length; i++) {
+			let next: string = chars[i];
+
+			if (["=", "+", "-", "/", "*"].includes(next)) {
+
+				tokens.push({type: "OP", val: next});
 			}
-			else if (item === "(" || item === ")") {
-				tokens.push({type: "PAREN", val: item});
+			else if (next === "(" || next === ")") {
+				tokens.push({type: "PAREN", val: next});
 			}
-			else if (isDigits(item)) {
-				tokens.push({type: "NUM", val: item});
+			else if (/^\d+$/.test(next)) {
+				tokens.push({type: "NUM", val: next});
+
+				while (/^\d+$/.test(peek(i+1))) {
+					i = i + 1;
+					next = chars[i];
+					tokens[tokens.length - 1].val += next;
+				}
+			}
+			else if (next === " ") {
+				continue;
 			}
 			else {
-				tokens.push({type: "VAL", val: item})
-			}
-		});
+				tokens.push({type : "SYM", val: next});
 
-		tokens.push({type : "EOL", val: "\n"});
+				while (/^[a-z0-9]+$/i.test(peek(i + 1))) {
+					i = i + 1;
+					next = chars[i];
+					tokens[tokens.length - 1].val += next;
+				}
+			}
+		}
 	});
 
 	return tokens;

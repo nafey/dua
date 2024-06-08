@@ -24,7 +24,6 @@ let parseVar = (token) => {
 	};
 }
 
-
 let parsePrimary = (tokens: any[]) => {
 	let token = tokens[0];
 
@@ -68,9 +67,6 @@ let parseBinary = (tokens: any[], matchOp: string[], nextFn: Function) => {
 		if (openParens === 0 && item.type === "OP" && matchOp.includes(item.val)) {
 			break;	
 		}	
-		// if (isAdditive(item)) {
-		// 	break;
-		// }
 
 		before.push(item);
 	}
@@ -105,7 +101,7 @@ export let parseAdditive = (tokens: any[]) => {
 }
 
 
-let parseBlock = (tokens) => {
+let parseBlock = (tokens : any[]) => {
 	// Find EOl
 	let exprs : any = [];
 

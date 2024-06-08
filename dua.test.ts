@@ -1,4 +1,4 @@
-import { expect, test, beforeEach,  } from "bun:test";
+import { expect, test} from "bun:test";
 import { tokenize } from "./token.ts";
 import { parse, parseAdditive } from "./parse.ts";
 import { exec } from "./exec.ts";
@@ -43,6 +43,20 @@ test("Div 2", () => {
 
 test("Paren", () => {
 	expect(interpret("( 9 + 2 )")).toBe(11);
-	// let ret = tokenize("( 9 + 2 )")
-	// console.log(ret);
 });
+
+test("Paren 2", () => {
+	expect(interpret("2 + ( 9 + 2 )")).toBe(13);
+});
+
+test("Paren 3", () => {
+	expect(interpret("( 9 + 2 ) + 3")).toBe(14);
+});
+
+test("Paren 4", () => {
+	expect(interpret("( 9 + 2 ) * 3")).toBe(33);
+});
+
+test("No Space", () => {
+	expect(interpret("2+2")).toBe(4);
+})

@@ -6,7 +6,6 @@ import { readFile } from "./utils.ts";
 
 // const consoleDebug: any = console.debug;
 
-// console.debug = () => {};
 // console.log = () => {};
 
 
@@ -42,3 +41,8 @@ test("Div 2", () => {
 	expect(interpret("8 + 2 / 2")).toBe(9);
 });
 
+test("Paren", () => {
+	expect(interpret("( 9 + 2 )")).toBe(11);
+	// let ret = tokenize("( 9 + 2 )")
+	// console.log(ret);
+});

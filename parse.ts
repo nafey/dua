@@ -1,6 +1,6 @@
 import { Token } from "./token";
 
-export type Node = BlockNode | BinaryNode | ValNode;
+export type Node = BlockNode | BinaryNode | ValNode | InvocationNode;
 
 export interface BinaryNode {
 	type: string,
@@ -8,13 +8,19 @@ export interface BinaryNode {
 	rhs: Token | Node
 }
 
+export interface InvocationNode {
+	type: "INVOKE",
+	func: string
+}
+
+
 export interface ValNode {
 	type: string,
 	val: string
 }
 
 export interface BlockNode {
-	type: string,
+	type: "BLOCK",
 	exprs: Node[]
 }
 
@@ -29,6 +35,7 @@ let op = {
 let parsePrimary = (tokens: Token[]): Node => {
 	let token: Token = tokens[0];
 
+
 	if (tokens.length >= 2) {
 		let lastToken: Token = tokens[tokens.length - 1];
 
@@ -39,6 +46,15 @@ let parsePrimary = (tokens: Token[]): Node => {
 			else {
 				throw Error("Mismatching Parenthesis")
 			}
+		}
+		else if(token.type === "SYM" && tokens[1].val === "(" && lastToken.val === ")") {
+			return {
+				type: "INVOKE",
+				func: token.val
+			}
+		} 
+		else {
+			throw Error("Unexpected primary expression");
 		}
 	}	
 

@@ -1,4 +1,22 @@
 let vars = {};
+let funcs = {};
+
+funcs["one"] = {
+	type: "FUNC",	
+	exprs: [
+		{
+			type: "ASSIGN",
+			lhs: {
+				type: "SYM",
+				val: "a"
+			},
+			rhs: {
+				type: "NUM",
+				val: 1
+			}	
+		}
+	]
+}
 
 let isNum = (stm) => {
 	return stm.type === "NUM";
@@ -17,6 +35,14 @@ let execNum = (stm) => {
 
 let execAssign = (stm) => {
 	vars[stm.lhs.val] = execNum(stm.rhs)
+}
+
+let execInvoke = (stm) => {
+	let f = funcs[stm.func]
+	return exec({
+		type: "BLOCK",
+		exprs: f.exprs
+	})
 }
 
 let execSum = (stm) => {
@@ -53,6 +79,9 @@ function execExpr(stm) {
 	}
 	else if (stm.type === "DIFF") {
 		return execDiff(stm);
+	}
+	else if (stm.type === "INVOKE") {
+		return execInvoke(stm);
 	}
 	else if (stm.type === "BLOCK") {
 		stm.exprs.forEach((expr) => {

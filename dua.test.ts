@@ -65,4 +65,8 @@ test("No Space", () => {
 
 test("Assign", () => {
 	expect(dumpVars("a = 1").a).toBe(1);
+});
+
+test.only("Func", () => {
+	expect(dumpVars("one()").a).toBe(1);
 })

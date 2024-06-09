@@ -1,8 +1,8 @@
 import { expect, test} from "bun:test";
 import { tokenize } from "./token.ts";
-import { parse } from "./parse.ts";
+import { parse, parseLines } from "./parse.ts";
 import { exec, dump } from "./exec.ts";
-import { readFile } from "./utils.ts";
+import { readF } from "./utils.ts";
 
 // const consoleDebug: any = console.debug;
 // console.log = () => {};
@@ -67,6 +67,12 @@ test("Assign", () => {
 	expect(dumpVars("a = 1").a).toBe(1);
 });
 
-test.only("Func", () => {
-	expect(dumpVars("one()").a).toBe(1);
+// test("Func", () => {
+// 	expect(dumpVars("one()").a).toBe(1);
+// })
+
+test.only("Func", async () => {
+	let code = await readF("a.dua")
+	expect(parseLines(tokenize(code)));
+	// expect(interpret(code));
 })

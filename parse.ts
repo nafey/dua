@@ -1,6 +1,8 @@
 import { Token } from "./token";
 
-export type Node = BlockNode | BinaryNode | ValNode | InvocationNode;
+export type Line = Token[];
+
+export type Node = BlockNode | BinaryNode | ValNode | InvocationNode | FnNode;
 
 export interface BinaryNode {
 	type: string,
@@ -22,6 +24,11 @@ export interface ValNode {
 export interface BlockNode {
 	type: "BLOCK",
 	exprs: Node[]
+}
+
+export interface FnNode {
+	type : "FN",
+	body: BlockNode,
 }
 
 let op = {
@@ -54,7 +61,7 @@ let parsePrimary = (tokens: Token[]): Node => {
 			}
 		} 
 		else {
-			throw Error("Unexpected primary expression");
+			throw Error("Unexpected primary expression of type " + token.type);
 		}
 	}	
 
@@ -71,6 +78,8 @@ let parseBinary = (tokens: Token[], matchOp: string[], nextFn: Function): Node =
 
 	for (i = 0; i < tokens.length; i++) {
 		let item: Token = tokens[i];
+		if (item.type === "INDENT") continue;
+
 		if (item.type === "PAREN" && item.val === "(") openParens++;
 		if (item.type === "PAREN" && item.val === ")") {
 			openParens--;
@@ -116,8 +125,11 @@ let parseAssign = (tokens: Token[]): Node => {
 	return parseBinary(tokens, ["="], parseAdditive);
 }
 
+let parseLine = (tokens: Token[]) : Node => {
+	return parseAssign(tokens);
+}
 
-let parseBlock = (tokens: Token[]): Node => {
+let parseBlock2 = (tokens: Token[]): Node => {
 	// Find EOl
 	let exprs: Node[] = [];
 
@@ -125,7 +137,7 @@ let parseBlock = (tokens: Token[]): Node => {
 
 	tokens.forEach((t) => {
 		if (t.type === "EOL") {
-			exprs.push(parseAssign(pulled));
+			exprs.push(parseLine(pulled));
 			pulled = [];
 		}
 		else {
@@ -133,7 +145,7 @@ let parseBlock = (tokens: Token[]): Node => {
 		}
 	});
 
-	if (pulled.length > 0) exprs.push(parseAssign(pulled));
+	if (pulled.length > 0) exprs.push(parseLine(pulled));
 
 
 	if (exprs.length <= 1) {
@@ -145,12 +157,74 @@ let parseBlock = (tokens: Token[]): Node => {
 			exprs: exprs
 		}
 	}
-
 }
+
+let getIndentation = (line: Line) => {
+	let i = 0;
+	for (i = 0; i < line.length; i++) {
+		if (line[i].type !== "INDENT") {
+			return i;
+		}
+	}
+
+	return i;
+}
+
+let parseBlock = (lines: Line[], indentation = 0) : Node => {
+	let nodes : Node[] = [];
+
+	for (let i = 0; i < lines.length; i++) {
+		let line = lines[i];
+		if (getIndentation(line) > indentation) {
+			continue;
+		}
+
+		if (getIndentation(line) < indentation) {
+			return {type: "BLOCK", exprs: nodes};
+		}
+
+		if (line[0].type === "SYM" && line[0].val === "fn") {
+			let fnBody = parseBlock(lines.slice(i + 1), indentation + 1) as BlockNode;
+			nodes.push({type :"FN", body: fnBody});
+		}
+		else {
+			nodes.push(parseLine(line));
+		}
+	}
+
+	return {type: "BLOCK", exprs: nodes};
+}
+
+
+export let parseLines = (tokens: Token[]) : Node =>  {
+	let lines:  Line[] = [];
+	lines.push([]);
+
+	for (let i = 0; i < tokens.length; i++) {
+		let token: Token = tokens[i];
+		if (token.type === "EOL") {
+			lines.push([]);
+		}
+		else {
+			lines[lines.length - 1].push(token);
+		}
+	}
+
+
+
+
+	let b = parseBlock(lines, 0);
+	console.log(JSON.stringify(b, null, 4));
+	// console.log(b);
+	// console.log(b.exprs[0].body);
+
+	return b;
+}
+
+
 
 export function parse (tokens: Token[]): Node {
-	let ret =  parseBlock(tokens)
+	let ret =  parseLines(tokens)
+	console.log(ret);
 	return ret;
 }
-
-

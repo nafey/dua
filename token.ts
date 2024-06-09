@@ -8,15 +8,19 @@ export function tokenize (code : string) : Token[] {
 
 	let lines: string[] = code.split("\n");
 
-	lines.forEach((line: string) => {
-		// let items = line.split(" ");
+	lines.forEach((line: string, i: number) => {
+		if (i > 0) {
+			if (tokens[tokens.length - 1].type !== "EOL") {
+				tokens.push({type: "EOL", val : "\n"});
+			}
+		}
+
 		let chars = line.split("");
 
 		let peek = (idx: number) => {
 			if (idx < chars.length) return chars[idx];
 			else return "";
 		}
-
 
 		for (let i = 0; i < chars.length; i++) {
 			let next: string = chars[i];
@@ -27,6 +31,9 @@ export function tokenize (code : string) : Token[] {
 			}
 			else if (next === "(" || next === ")") {
 				tokens.push({type: "PAREN", val: next});
+			}
+			else if (next === "\t") {
+				tokens.push({type: "INDENT", val: next});
 			}
 			else if (/^\d+$/.test(next)) {
 				tokens.push({type: "NUM", val: next});
@@ -51,6 +58,7 @@ export function tokenize (code : string) : Token[] {
 			}
 		}
 	});
+
 
 
 	return tokens;

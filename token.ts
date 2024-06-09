@@ -59,8 +59,6 @@ export function tokenize (code : string) : Token[] {
 		}
 	});
 
-
-
 	return tokens;
 }
 

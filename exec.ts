@@ -1,22 +1,22 @@
 let vars = {};
 let funcs = {};
 
-funcs["one"] = {
-	type: "FUNC",	
-	exprs: [
-		{
-			type: "ASSIGN",
-			lhs: {
-				type: "SYM",
-				val: "a"
-			},
-			rhs: {
-				type: "NUM",
-				val: 1
-			}	
-		}
-	]
-}
+// funcs["one"] = {
+// 	type: "FUNC",	
+// 	exprs: [
+// 		{
+// 			type: "ASSIGN",
+// 			lhs: {
+// 				type: "SYM",
+// 				val: "a"
+// 			},
+// 			rhs: {
+// 				type: "NUM",
+// 				val: 1
+// 			}	
+// 		}
+// 	]
+// }
 
 let isNum = (stm) => {
 	return stm.type === "NUM";
@@ -39,10 +39,16 @@ let execAssign = (stm) => {
 
 let execInvoke = (stm) => {
 	let f = funcs[stm.func]
+
 	return exec({
-		type: "BLOCK",
-		exprs: f.exprs
+		type: "LINES",
+		lines: f.lines
+
 	})
+}
+
+let execFn = (stm) => {
+	funcs[stm.name] = stm;
 }
 
 let execSum = (stm) => {
@@ -83,10 +89,16 @@ function execExpr(stm) {
 	else if (stm.type === "INVOKE") {
 		return execInvoke(stm);
 	}
-	else if (stm.type === "BLOCK") {
-		stm.exprs.forEach((expr) => {
-			execExpr(expr);
+	else if (stm.type === "FN") {
+		return execFn(stm);
+	}
+	else if (stm.type === "LINES") {
+		let last : any = null;
+		stm.lines.forEach((line) => {
+			 last = execExpr(line);
 		});
+
+		return last;
 	}
 }
 

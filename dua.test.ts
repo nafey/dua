@@ -67,12 +67,9 @@ test("Assign", () => {
 	expect(dumpVars("a = 1").a).toBe(1);
 });
 
-// test("Func", () => {
-// 	expect(dumpVars("one()").a).toBe(1);
-// })
 
-test.only("Func", async () => {
+test("Func", async () => {
 	let code = await readF("a.dua")
-	expect(parseLines(tokenize(code)));
-	// expect(interpret(code));
+	let ret = dumpVars(code);
+	expect(ret.a).toBe(1);
 })

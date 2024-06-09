@@ -21,17 +21,17 @@ export interface ValNode {
 	val: string
 }
 
-export type BlockNode = ExprsNode | FnNode;
+export type BlockNode = LinesNode | FnNode;
 
-export interface ExprsNode {
-	type: "BLOCK",
-	exprs: Node[]
+export interface LinesNode {
+	type: "LINES",
+	lines: Node[]
 }
 
 export interface FnNode {
 	type : "FN",
 	name: string,
-	body: Node[],
+	lines: Node[],
 }
 
 let op = {
@@ -120,7 +120,7 @@ let parseMultiplicative = (tokens: Token[]): Node => {
 	return parseBinary(tokens, ["*", "/"], parsePrimary)
 }
 
-export let parseAdditive = (tokens: Token[]): Node => {
+let parseAdditive = (tokens: Token[]): Node => {
 	return parseBinary(tokens, ["+", "-"], parseMultiplicative)
 }
 
@@ -132,35 +132,6 @@ let parseLine = (tokens: Token[]) : Node => {
 	return parseAssign(tokens);
 }
 
-let parseBlock2 = (tokens: Token[]): Node => {
-	// Find EOl
-	let exprs: Node[] = [];
-
-	let pulled: Token[] = [];
-
-	tokens.forEach((t) => {
-		if (t.type === "EOL") {
-			exprs.push(parseLine(pulled));
-			pulled = [];
-		}
-		else {
-			pulled.push(t);
-		}
-	});
-
-	if (pulled.length > 0) exprs.push(parseLine(pulled));
-
-
-	if (exprs.length <= 1) {
-		return exprs[0];
-	}
-	else {
-		return {
-			type: "BLOCK",
-			exprs: exprs
-		}
-	}
-}
 
 let getIndentation = (line: Line) => {
 	let i = 0;
@@ -183,20 +154,20 @@ let parseBlock = (lines: Line[], indentation = 0) : Node => {
 		}
 
 		if (getIndentation(line) < indentation) {
-			return {type: "BLOCK", exprs: nodes};
+			return {type: "LINES", lines: nodes};
 		}
 
 		if (line[0].type === "SYM" && line[0].val === "fn") {
 			let fnName = line[1].val;
-			let fnBody = parseBlock(lines.slice(i + 1), indentation + 1) as ExprsNode;
-			nodes.push({type :"FN", name: fnName, body: fnBody.exprs});
+			let fnBody = parseBlock(lines.slice(i + 1), indentation + 1) as LinesNode;
+			nodes.push({type :"FN", name: fnName, lines: fnBody.lines});
 		}
 		else {
 			nodes.push(parseLine(line));
 		}
 	}
 
-	return {type: "BLOCK", exprs: nodes};
+	return {type: "LINES", lines: nodes};
 }
 
 
@@ -215,20 +186,13 @@ export let parseLines = (tokens: Token[]) : Node =>  {
 	}
 
 
-
-
 	let b = parseBlock(lines, 0);
-	console.log(JSON.stringify(b, null, 4));
-	// console.log(b);
-	// console.log(b.exprs[0].body);
-
 	return b;
 }
 
 
 
 export function parse (tokens: Token[]): Node {
-	let ret =  parseLines(tokens)
-	console.log(ret);
+	let ret =  parseLines(tokens);
 	return ret;
 }

@@ -21,14 +21,17 @@ export interface ValNode {
 	val: string
 }
 
-export interface BlockNode {
+export type BlockNode = ExprsNode | FnNode;
+
+export interface ExprsNode {
 	type: "BLOCK",
 	exprs: Node[]
 }
 
 export interface FnNode {
 	type : "FN",
-	body: BlockNode,
+	name: string,
+	body: Node[],
 }
 
 let op = {
@@ -184,8 +187,9 @@ let parseBlock = (lines: Line[], indentation = 0) : Node => {
 		}
 
 		if (line[0].type === "SYM" && line[0].val === "fn") {
-			let fnBody = parseBlock(lines.slice(i + 1), indentation + 1) as BlockNode;
-			nodes.push({type :"FN", body: fnBody});
+			let fnName = line[1].val;
+			let fnBody = parseBlock(lines.slice(i + 1), indentation + 1) as ExprsNode;
+			nodes.push({type :"FN", name: fnName, body: fnBody.exprs});
 		}
 		else {
 			nodes.push(parseLine(line));
